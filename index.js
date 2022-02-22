@@ -21,7 +21,9 @@ app.use(requestLogger)
 
 
 let notes = JSON.parse(fs.readFileSync('db.json'))
-
+app.get('/', (request, response) => {
+    response.send(`<h1>Hello world</h1>`)
+})
 
 app.get('/hi/:name', (request, response) => {
     const name = request.params.name
