@@ -3,7 +3,7 @@
     "id": 1,
     "content": "HTML is easy",
     "date": "2019-05-30T17:30:31.098Z",
-    "important": false
+    "important": true
   },
   {
     "id": 2,
@@ -34,5 +34,11 @@
     "important": true,
     "date": "2022-02-22T09:32:08.942Z",
     "id": 6
+  },
+  {
+    "content": "YAAS!",
+    "important": false,
+    "date": "2022-02-22T10:04:58.669Z",
+    "id": 7
   }
 ]

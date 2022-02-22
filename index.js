@@ -5,8 +5,8 @@ const fs = require('fs')
 const app = express()
 
 app.use(cors())
-
-let notes = JSON.parse(fs.readFileSync('db.json'))
+app.use(express.json())
+app.use(express.static('build'))
 
 const requestLogger = (request, response, next) => {
     console.log('Method:', request.method)
@@ -17,14 +17,11 @@ const requestLogger = (request, response, next) => {
     next()
 }
 
-app.use(express.json())
-
 app.use(requestLogger)
 
 
-app.get('/', (request, response) => {
-    response.send(`<h1>Hello world</h1>`)
-})
+let notes = JSON.parse(fs.readFileSync('db.json'))
+
 
 app.get('/hi/:name', (request, response) => {
     const name = request.params.name
