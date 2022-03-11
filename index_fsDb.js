@@ -1,12 +1,9 @@
-require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const fs = require('fs')
+
 
 const app = express()
-
-const Note = require('./models/note')
-
-
 
 app.use(cors())
 app.use(express.json())
@@ -23,6 +20,9 @@ const requestLogger = (request, response, next) => {
 
 app.use(requestLogger)
 
+
+let notes = JSON.parse(fs.readFileSync('db.json'))
+
 app.get('/hi/:name', (request, response) => {
     const name = request.params.name
     console.log(`Greeting ${name}`)
@@ -30,15 +30,19 @@ app.get('/hi/:name', (request, response) => {
 })
 
 app.get('/api/notes', (request, response) => {
-    Note.find({}).then(notes => {
-        response.json(notes)
-    })
+    response.json(notes)
 })
 
 app.get('/api/notes/:id', (request, response) => {
-    Note.findById(request.params.id).then(note => {
+    const id = Number(request.params.id)
+    const note = notes.find(note => note.id === id)
+    if (note) {
         response.json(note)
-    })
+
+    } else {
+        response.statusMessage = 'Note ID not found'
+        response.status(404).end()
+    }
 })
 
 app.put('/api/notes/:id', (request, response) => {
@@ -50,7 +54,7 @@ app.put('/api/notes/:id', (request, response) => {
             ? note
             : body)
         response.json(body)
-        // fs.writeFileSync('db.json', JSON.stringify(notes, null, 2))
+        fs.writeFileSync('db.json', JSON.stringify(notes, null, 2))
     } else {response.status(404).end()}
 
 
@@ -71,17 +75,9 @@ const generateId = () => {
 }
 
 app.post('/api/notes', (request, response) => {
-    const body = request.body
-    
-    if (request.body === undefined) {
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
-
     if (request.is('application/json')) {
 
-        
+        const body = request.body
 
         if (!body.content) {
             return response.status(400).json({
@@ -89,17 +85,20 @@ app.post('/api/notes', (request, response) => {
             })
         }
 
-        const note = new Note({
+        const note = {
             content: body.content,
             important: body.important || false,
             date: new Date(),
-        })
+            id: generateId()
+        }
 
-        note.save().then(savedNote => {
-            response.json(savedNote)
-        })
 
-        // fs.writeFileSync('db.json', JSON.stringify(notes, null, 2))
+        notes = notes.concat(note)
+
+        console.log(notes)
+        response.json(note)
+
+        fs.writeFileSync('db.json', JSON.stringify(notes, null, 2))
 
     } else { response.status(400).json({ error: 'Not JSON' }) }
 }
@@ -112,7 +111,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}`)
 })
