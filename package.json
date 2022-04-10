@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js --ignore *.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "logs:prod": "heroku logs --tail",
+    "test": "jest --verbose"
   },
   "author": "Tom Radford",
   "license": "MIT",
@@ -18,6 +20,11 @@
     "mongoose": "^6.2.4"
   },
   "devDependencies": {
+    "eslint": "^8.12.0",
+    "jest": "^27.5.1",
     "nodemon": "^2.0.15"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
